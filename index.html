@@ -109,7 +109,7 @@
                 <section id="settings-section" class="card" style="display: none;">
                     <h2><i class="fas fa-cogs"></i> সাইট সেটিংস</h2>
                     <div class="form-group"><label for="live-text">স্ক্রলিং টেক্সট</label><input type="text" id="live-text" class="form-control"></div>
-                    <div class="form-group"><label for="zone-id">বিজ্ঞাপন জোন আইডি</label><input type="text" id="zone-id" class="form-control"></div>
+                    <!-- ===== বিজ্ঞাপন জোন আইডির ফিল্ডটি এখান থেকে সরিয়ে দেওয়া হয়েছে ===== -->
                     <div class="form-group"><label for="unlock-count">ভিডিও আনলক ভিউ</label><input type="number" id="unlock-count" class="form-control"></div>
                     <div class="form-group"><label for="rules-text-input">নিয়মাবলী টেক্সট</label><textarea id="rules-text-input" class="form-control"></textarea></div>
                     <button id="save-settings-btn" class="btn btn-primary"><i class="fas fa-save"></i> সেভ করুন</button>
@@ -220,7 +220,6 @@
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('overlay');
 
-                // --- অ্যানালিটিক্স ডেটা লোড ---
                 db.ref('analytics').on('value', (snapshot) => {
                     const analyticsData = snapshot.val() || {};
                     document.getElementById('total-users').textContent = analyticsData.total_users || 0;
@@ -230,18 +229,15 @@
                     document.getElementById('today-clicks').textContent = todayClicks;
                 });
 
-                // ===== নতুন কোড: সাইট সেটিংস লোড করে ফিল্ড পূরণ করা =====
                 db.ref('settings').on('value', (snapshot) => {
                     const settings = snapshot.val();
                     if (settings) {
                         document.getElementById('live-text').value = settings.live_text || '';
-                        document.getElementById('zone-id').value = settings.zone_id || '';
                         document.getElementById('unlock-count').value = settings.unlock_count || 15;
                         document.getElementById('rules-text-input').value = settings.rules_text || '';
                     }
                 });
                 
-                // ===== নতুন কোড: মেনু লিংক লোড করে ফিল্ড পূরণ করা =====
                 db.ref('menu_links').on('value', (snapshot) => {
                     const links = snapshot.val();
                     if (links) {
@@ -286,7 +282,6 @@
                     checkAuthAndRun(() => {
                         db.ref('settings').set({
                            live_text: document.getElementById('live-text').value.trim(),
-                           zone_id: document.getElementById('zone-id').value.trim(),
                            unlock_count: parseInt(document.getElementById('unlock-count').value) || 15,
                            rules_text: document.getElementById('rules-text-input').value.trim()
                         }).then(() => alert('সেটিংস সেভ হয়েছে!'));
