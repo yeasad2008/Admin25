@@ -175,7 +175,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // <<< নতুন ডাটাবেজ কনফিগারেশন শুরু >>>
             const firebaseConfig = {
                 apiKey: "AIzaSyBb39uq6so1Q1VxBCkVx-_21VC-H-6nARA",
                 authDomain: "viralzone-bca28.firebaseapp.com",
@@ -186,7 +185,6 @@
                 appId: "1:597855021699:web:ea4f115c56ce8ac3b9c9b6",
                 measurementId: "G-GSFBFCEBV5"
             };
-            // <<< নতুন ডাটাবেজ কনফিগারেশন শেষ >>>
 
             firebase.initializeApp(firebaseConfig);
             const auth = firebase.auth();
@@ -222,20 +220,35 @@
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('overlay');
 
-                // --- অ্যানালিটিক্স ডেটা লোড করার নতুন কোড ---
+                // --- অ্যানালিটিক্স ডেটা লোড ---
                 db.ref('analytics').on('value', (snapshot) => {
-                    const analyticsData = snapshot.val();
-                    if (analyticsData) {
-                        document.getElementById('total-users').textContent = analyticsData.total_users || 0;
-                        document.getElementById('total-clicks').textContent = analyticsData.total_ad_clicks || 0;
-                        
-                        const today = new Date().toISOString().slice(0, 10);
-                        const todayClicks = analyticsData.daily_ad_clicks ? (analyticsData.daily_ad_clicks[today] || 0) : 0;
-                        document.getElementById('today-clicks').textContent = todayClicks;
-                    } else {
-                        document.getElementById('total-users').textContent = 0;
-                        document.getElementById('total-clicks').textContent = 0;
-                        document.getElementById('today-clicks').textContent = 0;
+                    const analyticsData = snapshot.val() || {};
+                    document.getElementById('total-users').textContent = analyticsData.total_users || 0;
+                    document.getElementById('total-clicks').textContent = analyticsData.total_ad_clicks || 0;
+                    const today = new Date().toISOString().slice(0, 10);
+                    const todayClicks = analyticsData.daily_ad_clicks ? (analyticsData.daily_ad_clicks[today] || 0) : 0;
+                    document.getElementById('today-clicks').textContent = todayClicks;
+                });
+
+                // ===== নতুন কোড: সাইট সেটিংস লোড করে ফিল্ড পূরণ করা =====
+                db.ref('settings').on('value', (snapshot) => {
+                    const settings = snapshot.val();
+                    if (settings) {
+                        document.getElementById('live-text').value = settings.live_text || '';
+                        document.getElementById('zone-id').value = settings.zone_id || '';
+                        document.getElementById('unlock-count').value = settings.unlock_count || 15;
+                        document.getElementById('rules-text-input').value = settings.rules_text || '';
+                    }
+                });
+                
+                // ===== নতুন কোড: মেনু লিংক লোড করে ফিল্ড পূরণ করা =====
+                db.ref('menu_links').on('value', (snapshot) => {
+                    const links = snapshot.val();
+                    if (links) {
+                        document.getElementById('contact-link-input').value = links.contact_us || '';
+                        document.getElementById('telegram-link-input').value = links.telegram || '';
+                        document.getElementById('website18-link-input').value = links.website18 || '';
+                        document.getElementById('youtube-link-input').value = links.youtube || '';
                     }
                 });
 
@@ -342,7 +355,6 @@
                         }
                     });
                 });
-
 
                 document.getElementById('add-video-btn').addEventListener('click', () => {
                     checkAuthAndRun(() => {
